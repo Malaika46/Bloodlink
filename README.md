@@ -67,12 +67,12 @@ php artisan key:generate
 
 ### 3. Configure `.env`
 ```env
-DB_DATABASE=bloodlink
+DB_DATABASE=bdname
 DB_USERNAME=root
-DB_PASSWORD=your_password
+DB_PASSWORD=password
 
 # Required for the Find Donor map
-GOOGLE_MAPS_KEY=your_google_maps_api_key_here
+GOOGLE_MAPS_KEY=google_maps_api_key_here
 ```
 
 ### 4. Database
