@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — BloodLink</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit"><span class="drop">🩸</span> BloodLink</a></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="find-donor.html">Find Donor</a>
+      <a href="emergency.html">🚨 Emergency</a>
+      <a href="login.html" class="btn-nav-outline">Login</a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="find-donor.html">Find Donor</a>
+    <a href="emergency.html">Emergency</a>
+    <a href="login.html">Login</a>
+  </div>
+
+  <div class="auth-page">
+    <!-- Step 1: Basic Info -->
+    <div class="auth-card" id="step1">
+      <div class="auth-logo">🩸 BloodLink</div>
+      <h2>Create Your Account</h2>
+      <p class="auth-sub">Join thousands of life-savers across Pakistan</p>
+
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="reg_name" placeholder="Muhammad Ali" />
+      </div>
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" id="reg_email" placeholder="you@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="reg_phone" placeholder="03XX-XXXXXXX" />
+      </div>
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="reg_pass" placeholder="Min 6 characters" />
+      </div>
+      <div class="form-group">
+        <label>Blood Group *</label>
+        <select id="reg_bg">
+          <option value="">-- Select Blood Group --</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+          <option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>City *</label>
+        <select id="reg_city">
+          <option value="">-- Select City --</option>
+          <option>Lahore</option><option>Karachi</option><option>Islamabad</option>
+          <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option>
+          <option>Peshawar</option><option>Quetta</option><option>Sialkot</option>
+          <option>Gujranwala</option><option>Hyderabad</option><option>Abbottabad</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Age *</label>
+        <input type="number" id="reg_age" placeholder="18-60" min="18" max="60"/>
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label><input type="radio" name="gender" value="Male" checked/> Male</label>
+          <label><input type="radio" name="gender" value="Female"/> Female</label>
+          <label><input type="radio" name="gender" value="Other"/> Other</label>
+        </div>
+      </div>
+
+      <div class="error-msg" id="step1Error"></div>
+      <button class="btn-primary full" onclick="goToStep2()">Continue →</button>
+      <p class="auth-link">Already have an account? <a href="login.html">Login</a></p>
+    </div>
+
+    <!-- Step 2: Donor Question -->
+    <div class="auth-card donor-question" id="step2" style="display:none;">
+      <div class="dq-icon">🩸</div>
+      <h2>Will You Donate Blood?</h2>
+      <p class="auth-sub">Your decision can save up to <strong>3 lives</strong> with one donation. If you choose to donate, you'll be listed in our donor directory so people in need can find you.</p>
+
+      <div class="dq-options">
+        <button class="dq-btn yes" onclick="handleDonorChoice(true)">
+          <span class="dq-emoji">✅</span>
+          <strong>Yes, I'll Donate!</strong>
+          <small>Add me to the donor list</small>
+        </button>
+        <button class="dq-btn no" onclick="handleDonorChoice(false)">
+          <span class="dq-emoji">🙏</span>
+          <strong>Not Right Now</strong>
+          <small>I'll decide later from my profile</small>
+        </button>
+      </div>
+
+      <div class="donor-info-box" id="donorInfoBox" style="display:none;">
+        <h4>📋 A Few More Details</h4>
+        <div class="form-group">
+          <label>Last Donation Date (if any)</label>
+          <input type="date" id="reg_lastDonate"/>
+        </div>
+        <div class="form-group">
+          <label>Any Medical Conditions?</label>
+          <select id="reg_medical">
+            <option value="none">None</option>
+            <option value="hypertension">Hypertension</option>
+            <option value="diabetes">Diabetes</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Available Times</label>
+          <div class="check-group">
+            <label><input type="checkbox" value="morning"/> Morning (8am–12pm)</label>
+            <label><input type="checkbox" value="afternoon"/> Afternoon (12–5pm)</label>
+            <label><input type="checkbox" value="evening"/> Evening (5–9pm)</label>
+            <label><input type="checkbox" value="emergency"/> 24/7 Emergency Only</label>
+          </div>
+        </div>
+        <button class="btn-primary full" onclick="completeRegistration(true)">Complete Registration 🎉</button>
+      </div>
+
+      <div id="skipSection" style="display:none;">
+        <button class="btn-primary full" onclick="completeRegistration(false)">Complete Registration</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div class="auth-card" id="step3" style="display:none;">
+      <div class="success-anim">🎉</div>
+      <h2>Welcome to BloodLink!</h2>
+      <div id="successMsg"></div>
+      <div class="success-actions">
+        <a href="find-donor.html" class="btn-primary">Find Donors</a>
+        <a href="emergency.html" class="btn-ghost">Post Emergency</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    let regData = {};
+
+    function goToStep2() {
+      const name = document.getElementById('reg_name').value.trim();
+      const email = document.getElementById('reg_email').value.trim();
+      const phone = document.getElementById('reg_phone').value.trim();
+      const pass = document.getElementById('reg_pass').value;
+      const bg = document.getElementById('reg_bg').value;
+      const city = document.getElementById('reg_city').value;
+      const age = document.getElementById('reg_age').value;
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const err = document.getElementById('step1Error');
+
+      if (!name || !email || !phone || !pass || !bg || !city || !age) {
+        err.textContent = '⚠️ Please fill all required fields.';
+        return;
+      }
+      if (pass.length < 6) { err.textContent = '⚠️ Password must be at least 6 characters.'; return; }
+      if (parseInt(age) < 18 || parseInt(age) > 60) { err.textContent = '⚠️ Age must be between 18 and 60.'; return; }
+
+      // Check duplicate email
+      const users = JSON.parse(localStorage.getItem('bl_users') || '[]');
+      if (users.find(u => u.email === email)) {
+        err.textContent = '⚠️ This email is already registered. Please login.';
+        return;
+      }
+
+      regData = { name, email, phone, pass, bloodGroup: bg, city, age: parseInt(age), gender, id: Date.now().toString() };
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+    }
+
+    function handleDonorChoice(wantsDonate) {
+      regData.wantsDonate = wantsDonate;
+      if (wantsDonate) {
+        document.getElementById('donorInfoBox').style.display = 'block';
+        document.getElementById('skipSection').style.display = 'none';
+      } else {
+        document.getElementById('donorInfoBox').style.display = 'none';
+        document.getElementById('skipSection').style.display = 'block';
+      }
+    }
+
+    function completeRegistration(isDonor) {
+      // Get availability
+      const checks = document.querySelectorAll('.check-group input:checked');
+      const availability = Array.from(checks).map(c => c.value);
+
+      regData.isDonor = isDonor;
+      regData.lastDonate = document.getElementById('reg_lastDonate')?.value || '';
+      regData.medical = document.getElementById('reg_medical')?.value || 'none';
+      regData.availability = availability;
+      regData.createdAt = new Date().toISOString();
+      regData.donationsCount = 0;
+
+      // Save user
+      const users = JSON.parse(localStorage.getItem('bl_users') || '[]');
+      users.push(regData);
+      localStorage.setItem('bl_users', JSON.stringify(users));
+
+      // If donor, add to donors list
+      if (isDonor) {
+        const donors = JSON.parse(localStorage.getItem('bl_donors') || '[]');
+        donors.push({
+          id: regData.id,
+          name: regData.name,
+          bloodGroup: regData.bloodGroup,
+          city: regData.city,
+          age: regData.age,
+          gender: regData.gender,
+          phone: regData.phone,
+          availability: regData.availability,
+          medical: regData.medical,
+          lastDonate: regData.lastDonate,
+          donationsCount: 0,
+          available: true
+        });
+        localStorage.setItem('bl_donors', JSON.stringify(donors));
+      }
+
+      // Login session
+      localStorage.setItem('bl_session', JSON.stringify({ id: regData.id, name: regData.name, email: regData.email, bloodGroup: regData.bloodGroup, city: regData.city, isDonor }));
+
+      // Show success
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'block';
+      document.getElementById('successMsg').innerHTML = isDonor
+        ? `<div class="success-detail"><p>✅ You are now registered as a <strong>Blood Donor</strong>!</p><p>🩸 Blood Group: <strong>${regData.bloodGroup}</strong></p><p>📍 City: <strong>${regData.city}</strong></p><p>You will now appear in the Find Donor directory. People in need can contact you directly.</p></div>`
+        : `<div class="success-detail"><p>✅ Account created successfully!</p><p>You can enable donor status anytime from your profile.</p></div>`;
+    }
+  </script>
+</body>
+</html>

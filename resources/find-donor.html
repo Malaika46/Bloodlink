@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Find Donor — BloodLink</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit"><span class="drop">🩸</span> BloodLink</a></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="find-donor.html" class="active">Find Donor</a>
+      <a href="emergency.html">🚨 Emergency</a>
+      <span id="navAuth"></span>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="find-donor.html">Find Donor</a>
+    <a href="emergency.html">Emergency</a>
+  </div>
+
+  <div class="page-hero small">
+    <h1>🩸 Find a Donor</h1>
+    <p>Search verified donors by blood group and city</p>
+  </div>
+
+  <div class="find-page">
+    <!-- FILTERS -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Blood Group</label>
+        <select id="filter_bg" onchange="filterDonors()">
+          <option value="">All Groups</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+          <option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>City</label>
+        <select id="filter_city" onchange="filterDonors()">
+          <option value="">All Cities</option>
+          <option>Lahore</option><option>Karachi</option><option>Islamabad</option>
+          <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option>
+          <option>Peshawar</option><option>Quetta</option><option>Sialkot</option>
+          <option>Gujranwala</option><option>Hyderabad</option><option>Abbottabad</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Availability</label>
+        <select id="filter_avail" onchange="filterDonors()">
+          <option value="">Any Time</option>
+          <option value="emergency">Emergency 24/7</option>
+          <option value="morning">Morning</option>
+          <option value="afternoon">Afternoon</option>
+          <option value="evening">Evening</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn-ghost sm" onclick="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+
+    <div class="results-header">
+      <span id="resultsCount">Loading donors...</span>
+      <span class="results-note">📞 Contact donors directly</span>
+    </div>
+
+    <div class="donors-grid" id="donorsGrid"></div>
+    <div class="no-data-msg" id="noDonors" style="display:none;">
+      <div>😔</div>
+      <h3>No donors found</h3>
+      <p>Try different filters or <a href="emergency.html">post an emergency request</a></p>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div class="modal-overlay" id="contactModal" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <h3>Contact Donor</h3>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Add demo donors if none exist
+    function seedDonors() {
+      const existing = JSON.parse(localStorage.getItem('bl_donors') || '[]');
+      if (existing.length < 3) {
+        const seed = [
+          { id: 's1', name: 'Ahmed Khan', bloodGroup: 'O+', city: 'Lahore', age: 28, gender: 'Male', phone: '0300-1234567', availability: ['morning','emergency'], medical: 'none', donationsCount: 5, available: true },
+          { id: 's2', name: 'Fatima Zahra', bloodGroup: 'A+', city: 'Karachi', age: 24, gender: 'Female', phone: '0311-9876543', availability: ['evening'], medical: 'none', donationsCount: 2, available: true },
+          { id: 's3', name: 'Bilal Hussain', bloodGroup: 'B+', city: 'Islamabad', age: 32, gender: 'Male', phone: '0333-5556677', availability: ['morning','afternoon'], medical: 'none', donationsCount: 8, available: true },
+          { id: 's4', name: 'Ayesha Siddiqui', bloodGroup: 'AB+', city: 'Lahore', age: 26, gender: 'Female', phone: '0321-4441122', availability: ['emergency'], medical: 'none', donationsCount: 1, available: true },
+          { id: 's5', name: 'Usman Ghani', bloodGroup: 'O-', city: 'Rawalpindi', age: 30, gender: 'Male', phone: '0345-7778899', availability: ['morning','evening','emergency'], medical: 'none', donationsCount: 12, available: true },
+          { id: 's6', name: 'Zara Tariq', bloodGroup: 'B-', city: 'Faisalabad', age: 22, gender: 'Female', phone: '0312-6665544', availability: ['afternoon'], medical: 'none', donationsCount: 0, available: true },
+          { id: 's7', name: 'Hassan Raza', bloodGroup: 'A-', city: 'Multan', age: 35, gender: 'Male', phone: '0300-9988776', availability: ['morning','emergency'], medical: 'none', donationsCount: 3, available: true },
+          { id: 's8', name: 'Nimra Iqbal', bloodGroup: 'AB-', city: 'Karachi', age: 29, gender: 'Female', phone: '0333-1122334', availability: ['evening','emergency'], medical: 'none', donationsCount: 4, available: true },
+          { id: 's9', name: 'Kamran Ali', bloodGroup: 'O+', city: 'Islamabad', age: 27, gender: 'Male', phone: '0321-3344556', availability: ['morning'], medical: 'none', donationsCount: 6, available: true },
+          { id: 's10', name: 'Sana Mirza', bloodGroup: 'A+', city: 'Lahore', age: 31, gender: 'Female', phone: '0345-2233445', availability: ['afternoon','evening'], medical: 'none', donationsCount: 7, available: true },
+        ];
+        const merged = [...existing];
+        seed.forEach(s => { if (!existing.find(e => e.id === s.id)) merged.push(s); });
+        localStorage.setItem('bl_donors', JSON.stringify(merged));
+      }
+    }
+
+    function filterDonors() {
+      const bg = document.getElementById('filter_bg').value;
+      const city = document.getElementById('filter_city').value;
+      const avail = document.getElementById('filter_avail').value;
+
+      let donors = JSON.parse(localStorage.getItem('bl_donors') || '[]');
+      if (bg) donors = donors.filter(d => d.bloodGroup === bg);
+      if (city) donors = donors.filter(d => d.city === city);
+      if (avail) donors = donors.filter(d => d.availability && d.availability.includes(avail));
+
+      renderDonors(donors);
+    }
+
+    function clearFilters() {
+      document.getElementById('filter_bg').value = '';
+      document.getElementById('filter_city').value = '';
+      document.getElementById('filter_avail').value = '';
+      filterDonors();
+    }
+
+    function renderDonors(donors) {
+      const grid = document.getElementById('donorsGrid');
+      const noData = document.getElementById('noDonors');
+      const count = document.getElementById('resultsCount');
+
+      count.textContent = `${donors.length} donor${donors.length !== 1 ? 's' : ''} found`;
+
+      if (donors.length === 0) {
+        grid.innerHTML = '';
+        noData.style.display = 'flex';
+        return;
+      }
+      noData.style.display = 'none';
+
+      grid.innerHTML = donors.map(d => `
+        <div class="donor-card">
+          <div class="dc-top">
+            <div class="dc-avatar">${d.name.charAt(0)}</div>
+            <div class="dc-info">
+              <h3>${d.name}</h3>
+              <p>📍 ${d.city} &nbsp;·&nbsp; ${d.gender} &nbsp;·&nbsp; Age ${d.age}</p>
+            </div>
+            <div class="dc-bg">${d.bloodGroup}</div>
+          </div>
+          <div class="dc-badges">
+            ${(d.availability || []).map(a => `<span class="avail-badge">${availLabel(a)}</span>`).join('')}
+            ${d.donationsCount > 0 ? `<span class="donate-count">🩸 ${d.donationsCount} donations</span>` : ''}
+          </div>
+          <div class="dc-actions">
+            <button class="btn-primary sm" onclick="showContact('${d.id}')">📞 Contact</button>
+            ${d.available ? '<span class="avail-tag">✅ Available</span>' : '<span class="unavail-tag">❌ Unavailable</span>'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function availLabel(a) {
+      const map = { morning: '🌅 Morning', afternoon: '🌤️ Afternoon', evening: '🌇 Evening', emergency: '🚨 Emergency 24/7' };
+      return map[a] || a;
+    }
+
+    function showContact(id) {
+      const donors = JSON.parse(localStorage.getItem('bl_donors') || '[]');
+      const d = donors.find(x => x.id === id);
+      if (!d) return;
+      document.getElementById('modalContent').innerHTML = `
+        <div class="contact-detail">
+          <div class="cd-avatar">${d.name.charAt(0)}</div>
+          <h2>${d.name}</h2>
+          <p><strong>Blood Group:</strong> ${d.bloodGroup}</p>
+          <p><strong>City:</strong> ${d.city}</p>
+          <p><strong>Age:</strong> ${d.age}</p>
+          <p><strong>Gender:</strong> ${d.gender}</p>
+          <div class="contact-phone">
+            <p>📞 <strong>${d.phone}</strong></p>
+            <a href="tel:${d.phone}" class="btn-primary">Call Now</a>
+            <a href="https://wa.me/92${d.phone.replace(/[^0-9]/g,'').substring(1)}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+          </div>
+          <p class="contact-note">⚠️ Please be respectful. Donors are volunteers giving their time to save lives.</p>
+        </div>
+      `;
+      document.getElementById('contactModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('contactModal').style.display = 'none';
+    }
+
+    // Init
+    seedDonors();
+
+    // Pre-fill from URL params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('bg')) document.getElementById('filter_bg').value = params.get('bg');
+    if (params.get('city')) document.getElementById('filter_city').value = params.get('city');
+
+    filterDonors();
+
+    // Nav auth
+    const sess = JSON.parse(localStorage.getItem('bl_session') || 'null');
+    const navAuth = document.getElementById('navAuth');
+    if (sess) {
+      navAuth.innerHTML = `<span class="nav-user">Hi, ${sess.name.split(' ')[0]} 👋</span> <a href="#" onclick="logout()">Logout</a>`;
+    } else {
+      navAuth.innerHTML = `<a href="register.html" class="btn-nav">Register</a> <a href="login.html" class="btn-nav-outline">Login</a>`;
+    }
+  </script>
+</body>
+</html>

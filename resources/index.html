@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BloodLink — Save Lives</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="drop">🩸</span> BloodLink
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="find-donor.html">Find Donor</a>
+      <a href="emergency.html">🚨 Emergency</a>
+      <a href="register.html" class="btn-nav">Register</a>
+      <a href="login.html" class="btn-nav-outline">Login</a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="find-donor.html">Find Donor</a>
+    <a href="emergency.html">🚨 Emergency</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="blob blob1"></div>
+      <div class="blob blob2"></div>
+    </div>
+    <div class="hero-content">
+      <span class="badge">Pakistan's Blood Network</span>
+      <h1>Every Drop<br/><em>Saves a Life</em></h1>
+      <p>Connect with verified blood donors across Pakistan. Real-time emergency requests. Zero middlemen.</p>
+      <div class="hero-btns">
+        <a href="find-donor.html" class="btn-primary">Find a Donor</a>
+        <a href="emergency.html" class="btn-ghost">Post Emergency 🚨</a>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><strong id="donorCount">0</strong><span>Donors</span></div>
+        <div class="stat"><strong id="livesSaved">0</strong><span>Lives Saved</span></div>
+        <div class="stat"><strong id="cities">0</strong><span>Cities</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="heart-pulse">
+        <div class="heart">❤️</div>
+        <svg class="pulse-line" viewBox="0 0 300 80">
+          <polyline points="0,40 50,40 70,10 90,70 110,40 150,40 170,20 190,60 210,40 300,40" fill="none" stroke="#8b0000" stroke-width="3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">📝</div>
+        <h3>Register</h3>
+        <p>Create your account and tell us your blood group and city</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-icon">🩸</div>
+        <h3>Become a Donor</h3>
+        <p>Opt-in to donate and appear in our donor directory</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-icon">🔔</div>
+        <h3>Get Matched</h3>
+        <p>Receive alerts for emergency requests in your city</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-icon">💪</div>
+        <h3>Save a Life</h3>
+        <p>Accept the request and contact the patient directly</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOOD GROUPS -->
+  <section class="blood-groups">
+    <h2>Find by Blood Group</h2>
+    <div class="bg-grid">
+      <a href="find-donor.html?bg=A+" class="bg-card">A+</a>
+      <a href="find-donor.html?bg=A-" class="bg-card">A−</a>
+      <a href="find-donor.html?bg=B+" class="bg-card">B+</a>
+      <a href="find-donor.html?bg=B-" class="bg-card">B−</a>
+      <a href="find-donor.html?bg=AB+" class="bg-card rare">AB+</a>
+      <a href="find-donor.html?bg=AB-" class="bg-card rare">AB−</a>
+      <a href="find-donor.html?bg=O+" class="bg-card universal">O+</a>
+      <a href="find-donor.html?bg=O-" class="bg-card universal">O−</a>
+    </div>
+    <p class="note">🌟 O− is the universal donor. AB+ is the universal recipient.</p>
+  </section>
+
+  <!-- LIVE EMERGENCY PREVIEW -->
+  <section class="emergency-preview">
+    <div class="ep-header">
+      <h2>🚨 Live Emergency Requests</h2>
+      <a href="emergency.html" class="see-all">See All →</a>
+    </div>
+    <div class="ep-list" id="emergencyPreview"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-brand">🩸 BloodLink</div>
+    <p>Connecting donors with those in need across Pakistan</p>
+    <div class="footer-links">
+      <a href="find-donor.html">Find Donor</a>
+      <a href="emergency.html">Emergency</a>
+      <a href="register.html">Register</a>
+    </div>
+    <p class="copy">© 2025 BloodLink. Built with ❤️ for Pakistan</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Animate stats
+    function animateCount(id, target, suffix='') {
+      let count = 0;
+      const step = Math.ceil(target / 60);
+      const el = document.getElementById(id);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = count.toLocaleString() + suffix;
+        if (count >= target) clearInterval(timer);
+      }, 30);
+    }
+    setTimeout(() => {
+      const donors = JSON.parse(localStorage.getItem('bl_donors') || '[]');
+      animateCount('donorCount', Math.max(donors.length, 247));
+      animateCount('livesSaved', 1843);
+      animateCount('cities', 32);
+    }, 500);
+
+    // Load emergency preview
+    function loadEmergencyPreview() {
+      const reqs = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      const container = document.getElementById('emergencyPreview');
+      const latest = reqs.slice(-3).reverse();
+      if (latest.length === 0) {
+        container.innerHTML = '<p class="no-data">No active emergency requests right now.</p>';
+        return;
+      }
+      container.innerHTML = latest.map(r => `
+        <div class="ep-card urgency-${r.urgency || 'high'}">
+          <div class="ep-left">
+            <span class="ep-bg">${r.bloodGroup}</span>
+            <div>
+              <strong>${r.patientName}</strong>
+              <p>${r.hospital} · ${r.city}</p>
+            </div>
+          </div>
+          <div class="ep-right">
+            <span class="ep-time">${timeAgo(r.timestamp)}</span>
+            <a href="emergency.html" class="ep-btn">Help Now</a>
+          </div>
+        </div>
+      `).join('');
+    }
+    loadEmergencyPreview();
+  </script>
+</body>
+</html>

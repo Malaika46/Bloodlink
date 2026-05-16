@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emergency Requests — BloodLink</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit"><span class="drop">🩸</span> BloodLink</a></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="find-donor.html">Find Donor</a>
+      <a href="emergency.html" class="active">🚨 Emergency</a>
+      <span id="navAuth"></span>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="find-donor.html">Find Donor</a>
+    <a href="emergency.html">Emergency</a>
+  </div>
+
+  <div class="page-hero emergency-hero">
+    <h1>🚨 Emergency Blood Requests</h1>
+    <p>Real-time requests from patients across Pakistan. Accept and save a life today.</p>
+    <button class="btn-primary" onclick="openPostModal()">+ Post Emergency Request</button>
+  </div>
+
+  <div class="emergency-page">
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Blood Group</label>
+        <select id="ef_bg" onchange="filterRequests()">
+          <option value="">All Groups</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+          <option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>City</label>
+        <select id="ef_city" onchange="filterRequests()">
+          <option value="">All Cities</option>
+          <option>Lahore</option><option>Karachi</option><option>Islamabad</option>
+          <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option>
+          <option>Peshawar</option><option>Quetta</option><option>Sialkot</option>
+          <option>Gujranwala</option><option>Hyderabad</option><option>Abbottabad</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select id="ef_status" onchange="filterRequests()">
+          <option value="active">Active Only</option>
+          <option value="">All</option>
+          <option value="fulfilled">Fulfilled</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn-ghost sm" onclick="clearEFilters()">Clear</button>
+      </div>
+    </div>
+
+    <div class="results-header">
+      <span id="eCount">Loading...</span>
+      <span class="live-badge">🔴 Live</span>
+    </div>
+
+    <div class="emergency-grid" id="emergencyGrid"></div>
+    <div class="no-data-msg" id="noEmergency" style="display:none;">
+      <div>✅</div>
+      <h3>No active emergency requests!</h3>
+      <p>Great news — no one needs blood urgently right now.</p>
+    </div>
+  </div>
+
+  <!-- POST MODAL -->
+  <div class="modal-overlay" id="postModal" onclick="closePostModal()">
+    <div class="modal large" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closePostModal()">×</button>
+      <h3>🚨 Post Emergency Request</h3>
+      <p class="modal-sub">Your request will be visible to all donors in real-time</p>
+
+      <div class="form-group">
+        <label>Patient Name *</label>
+        <input type="text" id="ep_name" placeholder="Patient's full name"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Blood Group Needed *</label>
+          <select id="ep_bg">
+            <option value="">-- Select --</option>
+            <option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option>
+            <option>O+</option><option>O-</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Units Needed *</label>
+          <input type="number" id="ep_units" placeholder="e.g. 2" min="1" max="10"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Hospital / Location *</label>
+        <input type="text" id="ep_hospital" placeholder="Hospital name and address"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City *</label>
+          <select id="ep_city">
+            <option value="">-- Select --</option>
+            <option>Lahore</option><option>Karachi</option><option>Islamabad</option>
+            <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option>
+            <option>Peshawar</option><option>Quetta</option><option>Sialkot</option>
+            <option>Gujranwala</option><option>Hyderabad</option><option>Abbottabad</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Urgency Level *</label>
+          <select id="ep_urgency">
+            <option value="critical">🔴 Critical (Today)</option>
+            <option value="high">🟠 High (24 hrs)</option>
+            <option value="medium">🟡 Medium (2-3 days)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Contact Number *</label>
+        <input type="tel" id="ep_phone" placeholder="03XX-XXXXXXX"/>
+      </div>
+      <div class="form-group">
+        <label>Additional Info</label>
+        <textarea id="ep_notes" placeholder="Patient condition, diagnosis, or any other info for donors..." rows="3"></textarea>
+      </div>
+
+      <div class="error-msg" id="epError"></div>
+      <div class="modal-btns">
+        <button class="btn-ghost" onclick="closePostModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitRequest()">🚨 Post Request Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accept Modal -->
+  <div class="modal-overlay" id="acceptModal" onclick="closeAcceptModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeAcceptModal()">×</button>
+      <h3>✅ Accept This Request</h3>
+      <div id="acceptContent"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Seed demo emergency requests
+    function seedEmergency() {
+      const existing = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      if (existing.length < 2) {
+        const seed = [
+          { id: 'e1', patientName: 'Shahid Mehmood', bloodGroup: 'O-', units: 2, hospital: 'Services Hospital', city: 'Lahore', urgency: 'critical', phone: '0300-5556789', notes: 'Patient undergoing emergency surgery. Needs blood urgently.', status: 'active', timestamp: Date.now() - 3600000, acceptedBy: [] },
+          { id: 'e2', patientName: 'Rehana Begum', bloodGroup: 'B+', units: 1, hospital: 'Aga Khan Hospital', city: 'Karachi', urgency: 'high', phone: '0311-2223344', notes: 'Thalassemia patient needs regular transfusion.', status: 'active', timestamp: Date.now() - 7200000, acceptedBy: [] },
+          { id: 'e3', patientName: 'Ali Raza', bloodGroup: 'A+', units: 3, hospital: 'PIMS Hospital', city: 'Islamabad', urgency: 'critical', phone: '0333-8887766', notes: 'Road accident victim. Multiple injuries.', status: 'active', timestamp: Date.now() - 1800000, acceptedBy: [] },
+        ];
+        const merged = [...existing];
+        seed.forEach(s => { if (!existing.find(e => e.id === s.id)) merged.push(s); });
+        localStorage.setItem('bl_emergency', JSON.stringify(merged));
+      }
+    }
+
+    function filterRequests() {
+      const bg = document.getElementById('ef_bg').value;
+      const city = document.getElementById('ef_city').value;
+      const status = document.getElementById('ef_status').value;
+
+      let reqs = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      if (bg) reqs = reqs.filter(r => r.bloodGroup === bg);
+      if (city) reqs = reqs.filter(r => r.city === city);
+      if (status) reqs = reqs.filter(r => r.status === status);
+
+      reqs.sort((a,b) => b.timestamp - a.timestamp);
+      renderRequests(reqs);
+    }
+
+    function clearEFilters() {
+      document.getElementById('ef_bg').value = '';
+      document.getElementById('ef_city').value = '';
+      document.getElementById('ef_status').value = 'active';
+      filterRequests();
+    }
+
+    function renderRequests(reqs) {
+      const grid = document.getElementById('emergencyGrid');
+      const noData = document.getElementById('noEmergency');
+      const count = document.getElementById('eCount');
+
+      count.textContent = `${reqs.length} request${reqs.length !== 1 ? 's' : ''} found`;
+
+      if (reqs.length === 0) {
+        grid.innerHTML = '';
+        noData.style.display = 'flex';
+        return;
+      }
+      noData.style.display = 'none';
+
+      grid.innerHTML = reqs.map(r => `
+        <div class="emergency-card urgency-${r.urgency} ${r.status === 'fulfilled' ? 'fulfilled' : ''}">
+          <div class="ec-header">
+            <div class="ec-bg">${r.bloodGroup}</div>
+            <div class="ec-info">
+              <h3>${r.patientName}</h3>
+              <p>🏥 ${r.hospital}</p>
+              <p>📍 ${r.city}</p>
+            </div>
+            <div class="ec-badges-right">
+              <span class="urgency-tag tag-${r.urgency}">${urgencyLabel(r.urgency)}</span>
+              ${r.status === 'fulfilled' ? '<span class="fulfilled-tag">✅ Fulfilled</span>' : ''}
+            </div>
+          </div>
+          <div class="ec-details">
+            <span>🩸 ${r.units} unit${r.units > 1 ? 's' : ''} needed</span>
+            <span>⏰ ${timeAgo(r.timestamp)}</span>
+            ${r.acceptedBy && r.acceptedBy.length > 0 ? `<span class="accepted-count">✋ ${r.acceptedBy.length} accepted</span>` : ''}
+          </div>
+          ${r.notes ? `<p class="ec-notes">${r.notes}</p>` : ''}
+          <div class="ec-actions">
+            ${r.status === 'active' ? `
+              <button class="btn-primary sm" onclick="acceptRequest('${r.id}')">✅ I Can Donate</button>
+              <a href="tel:${r.phone}" class="btn-ghost sm">📞 Call Now</a>
+            ` : `<span class="fulfilled-note">This request has been fulfilled. Thank you donors! 🙏</span>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function urgencyLabel(u) {
+      const map = { critical: '🔴 Critical', high: '🟠 High', medium: '🟡 Medium' };
+      return map[u] || u;
+    }
+
+    function openPostModal() {
+      // Pre-fill if logged in
+      const sess = JSON.parse(localStorage.getItem('bl_session') || 'null');
+      if (sess) {
+        document.getElementById('ep_city').value = sess.city || '';
+        document.getElementById('ep_phone').value = '';
+      }
+      document.getElementById('postModal').style.display = 'flex';
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').style.display = 'none';
+    }
+
+    function submitRequest() {
+      const name = document.getElementById('ep_name').value.trim();
+      const bg = document.getElementById('ep_bg').value;
+      const units = document.getElementById('ep_units').value;
+      const hospital = document.getElementById('ep_hospital').value.trim();
+      const city = document.getElementById('ep_city').value;
+      const urgency = document.getElementById('ep_urgency').value;
+      const phone = document.getElementById('ep_phone').value.trim();
+      const notes = document.getElementById('ep_notes').value.trim();
+      const err = document.getElementById('epError');
+
+      if (!name || !bg || !units || !hospital || !city || !phone) {
+        err.textContent = '⚠️ Please fill all required fields.'; return;
+      }
+
+      const reqs = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      const newReq = {
+        id: 'e' + Date.now(),
+        patientName: name, bloodGroup: bg, units: parseInt(units),
+        hospital, city, urgency, phone, notes,
+        status: 'active', timestamp: Date.now(), acceptedBy: []
+      };
+      reqs.push(newReq);
+      localStorage.setItem('bl_emergency', JSON.stringify(reqs));
+
+      closePostModal();
+      document.getElementById('ep_name').value = '';
+      document.getElementById('ep_bg').value = '';
+      document.getElementById('ep_units').value = '';
+      document.getElementById('ep_hospital').value = '';
+      document.getElementById('ep_city').value = '';
+      document.getElementById('ep_phone').value = '';
+      document.getElementById('ep_notes').value = '';
+      err.textContent = '';
+
+      showToast('🚨 Emergency request posted! Donors will see it now.', 'success');
+      filterRequests();
+    }
+
+    function acceptRequest(id) {
+      const sess = JSON.parse(localStorage.getItem('bl_session') || 'null');
+      if (!sess) {
+        showToast('⚠️ Please login to accept requests', 'error');
+        setTimeout(() => window.location.href = 'login.html', 1500);
+        return;
+      }
+
+      const reqs = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      const req = reqs.find(r => r.id === id);
+      if (!req) return;
+
+      if (req.acceptedBy && req.acceptedBy.find(a => a.id === sess.id)) {
+        showToast('You already accepted this request!', 'error');
+        return;
+      }
+
+      document.getElementById('acceptContent').innerHTML = `
+        <div class="accept-detail">
+          <p>You are accepting the request for <strong>${req.patientName}</strong> who needs <strong>${req.bloodGroup}</strong> blood.</p>
+          <p>🏥 <strong>${req.hospital}</strong>, ${req.city}</p>
+          <p>📞 Contact the family: <strong>${req.phone}</strong></p>
+          <div class="accept-actions">
+            <a href="tel:${req.phone}" class="btn-primary">📞 Call Family Now</a>
+            <a href="https://wa.me/92${req.phone.replace(/[^0-9]/g,'').substring(1)}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+          </div>
+          <button class="btn-ghost full mt" onclick="confirmAccept('${id}')">✅ Mark as Accepted</button>
+          <p class="contact-note">⚠️ Please call before going to the hospital. Coordinate the donation time with the family.</p>
+        </div>
+      `;
+      document.getElementById('acceptModal').style.display = 'flex';
+    }
+
+    function confirmAccept(id) {
+      const sess = JSON.parse(localStorage.getItem('bl_session') || 'null');
+      const reqs = JSON.parse(localStorage.getItem('bl_emergency') || '[]');
+      const req = reqs.find(r => r.id === id);
+      if (!req || !sess) return;
+
+      if (!req.acceptedBy) req.acceptedBy = [];
+      req.acceptedBy.push({ id: sess.id, name: sess.name, bloodGroup: sess.bloodGroup, timestamp: Date.now() });
+
+      // Mark fulfilled if enough donors
+      if (req.acceptedBy.length >= req.units) req.status = 'fulfilled';
+
+      localStorage.setItem('bl_emergency', JSON.stringify(reqs));
+      closeAcceptModal();
+      showToast('🎉 Thank you! You have accepted this request. Please contact the family now.', 'success');
+      filterRequests();
+    }
+
+    function closeAcceptModal() {
+      document.getElementById('acceptModal').style.display = 'none';
+    }
+
+    // Nav auth
+    const sess = JSON.parse(localStorage.getItem('bl_session') || 'null');
+    const navAuth = document.getElementById('navAuth');
+    if (sess) {
+      navAuth.innerHTML = `<span class="nav-user">Hi, ${sess.name.split(' ')[0]} 👋</span> <a href="#" onclick="logout()">Logout</a>`;
+    } else {
+      navAuth.innerHTML = `<a href="register.html" class="btn-nav">Register</a> <a href="login.html" class="btn-nav-outline">Login</a>`;
+    }
+
+    seedEmergency();
+    filterRequests();
+
+    // Auto-refresh every 30s
+    setInterval(filterRequests, 30000);
+  </script>
+</body>
+</html>
